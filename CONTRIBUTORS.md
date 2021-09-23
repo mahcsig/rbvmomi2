@@ -1,5 +1,6 @@
 * Adam Grare <agrare@redhat.com>
 * Anurag Uniyal <auniyal@vmware.com>
+* Atul Bhosale <atul1bhosale@gmail.com>
 * Benjamin Bytheway <ben.bytheway@imail.org>
 * Christian Dickmann <cdickmann@ubuntu.(none)>
 * Christian Dickmann <cdickmann@vmware.com>
@@ -19,6 +20,7 @@
 * Hari Krishnamurthy <hkrishna@vmware.com>
 * J.R. Garcia <jr@garciaole.com>
 * Jacob Evans <jacob@dekz.net>
+* Jason Frey <fryguy9@gmail.com>
 * Justin <justin@labs.epiuse.com>
 * Kevin Menard <nirvdrum@gmail.com>
 * Lalitha Sripada <lsripada@vmware.com>
@@ -37,7 +39,10 @@
 * Shawn Hartsock <hartsocks@vmware.com>
 * Shawn Hartsock <shawn.hartsock@gmail.com>
 * Soner Sevinc <sevincs@vmware.com>
+* Tae <tae8838@users.noreply.github.com>
+* Tim Smith <tsmith84@gmail.com>
 * Tom Bortels <bortels@gmail.com>
+* Tom Giordano <tomgiordano83@gmail.com>
 * Tu Hoang <rebyn@me.com>
 * administrator <administrator@cdickmann-mbpro.gateway.2wire.net>
 * cdickmann <christian.dickmann@gmail.com>
