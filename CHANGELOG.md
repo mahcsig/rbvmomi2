@@ -1,0 +1,18 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+This project adheres to [Semantic Versioning](http://semver.org/).
+
+## [Unreleased]
+
+## [3.0.1] - 2021-09-23
+### Changed
+- Remove WIN32::SSPI (#187)
+- Remove WIN32::SSPI usage (#186)
+- Add a script to verify vmodl.db from a wsdl file (#177)
+
+### Fixed
+- Fix unescaped characters in Datastore URLs (#183)
+- Improve #to_json behavior on RbVmomi Objects (#185)
+
+[Unreleased]: https://github.com/ManageIQ/rbvmomi2/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/ManageIQ/rbvmomi2/compare/v3.0.0-1...v3.0.1
