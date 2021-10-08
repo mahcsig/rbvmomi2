@@ -1,17 +1,21 @@
 # frozen_string_literal: true
 
+require_relative './vmodl_helper'
+
 namespace :vmodl do
   desc 'Verify vmodl.db'
   task :verify do
     wsdl_path, vmodl_path = parse_options.values_at(:wsdl, :vmodl)
 
-    `bundle exec ruby devel/verify-vim-wsdl.rb #{wsdl_path} #{vmodl_path}`
+    vmodl_helper = VmodlHelper.new(wsdl_path: wsdl_path, vmodl_path: vmodl_path)
+    vmodl_helper.verify!
   end
 
   task :generate do
     wsdl_path, vmodl_path = parse_options.values_at(:wsdl, :vmodl)
 
-    `bundle exec ruby devel/verify-vim-wsdl.rb #{wsdl_path} #{vmodl_path} --fix`
+    vmodl_helper = VmodlHelper.new(wsdl_path: wsdl_path, vmodl_path: vmodl_path)
+    vmodl_helper.generate!
   end
 
   private
