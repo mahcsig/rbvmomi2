@@ -1,11 +1,44 @@
 # frozen_string_literal: true
 require 'active_support/core_ext/enumerable'
 require 'active_support/inflector'
+require 'optimist'
 require 'pathname'
 require 'wsdl/parser'
 require 'rbvmomi'
+require 'rbvmomi/pbm'
+require 'rbvmomi/sms'
 
 class VmodlHelper
+  class << self
+    def verify!(argv)
+      opts = Optimist.options(argv) do
+        educate_on_error
+        opt :wsdl, 'Path to the vsphere-ws wsdl file', type: :string, required: true
+        opt :vmodl, 'Path to the vmodl.db', type: :string, default: 'vmodl.db'
+        banner <<~EOS
+          Usage:
+          rake vmodl:verify -- --wsdl=path/to/wsdl
+        EOS
+      end
+
+      new(vmodl_path: opts[:vmodl], wsdl_path: opts[:wsdl]).verify!
+    end
+
+    def generate!(argv)
+      opts = Optimist.options(argv) do
+        educate_on_error
+        opt :wsdl, 'Path to the vsphere-ws wsdl file', type: :string, required: true
+        opt :vmodl, 'Path to the vmodl.db', type: :string, default: 'vmodl.db'
+        banner <<~EOS
+          Usage:
+          rake vmodl:generate -- --wsdl=path/to/wsdl
+        EOS
+      end
+
+      new(vmodl_path: opts[:vmodl], wsdl_path: opts[:wsdl]).generate!
+    end
+  end
+
   def initialize(vmodl_path:, wsdl_path:)
     @vmodl_path = Pathname.new(vmodl_path)
     @wsdl_path  = Pathname.new(wsdl_path)
@@ -28,7 +61,10 @@ class VmodlHelper
       # vmodl.db supports.
       #
       # Print a warning that the type is missing and skip it.
-      puts " #{type_name} is missing" if vmodl_data.nil?
+      if vmodl_data.nil?
+        puts " #{type_name} is missing"
+        next
+      end
 
       # Index the properties by name to make it simpler to find later
       elements_by_name = type.elements.index_by { |e| e.name.name }
@@ -79,7 +115,7 @@ class VmodlHelper
 
         puts "Adding #{type_name} to vmodl"
 
-        RbVmomi::VIM.loader.add_types type_name => vmodl_data
+        wsdl_to_rbvmomi_namespace(type).loader.add_types type_name => vmodl_data
       end
     end
 
@@ -133,9 +169,8 @@ class VmodlHelper
 
   def wsdl_to_vmodl_type(type)
     case type.source
-    when /vim25:/
-      vmodl_type = type.name
-      vmodl_type = 'ManagedObject' if vmodl_type == 'ManagedObjectReference'
+    when /vim25:/, /pbm:/, /sms:/
+      vmodl_type = type.name == 'ManagedObjectReference' ? 'ManagedObject' : type.name
     when /xsd:/
       vmodl_type = type.source
     else
@@ -143,6 +178,19 @@ class VmodlHelper
     end
 
     vmodl_type
+  end
+
+  def wsdl_to_rbvmomi_namespace(type)
+    case type.targetnamespace
+    when 'urb:vim25'
+      RbVmomi::VIM
+    when 'urn:pbm'
+      RbVmomi::PBM
+    when 'urn:sms'
+      RbVmomi::SMS
+    else
+      raise ArgumentError, "Unrecognized namespace [#{type}]"
+    end
   end
 
   # Normalize the type, some of these don't have RbVmomi equivalents such as xsd:long
