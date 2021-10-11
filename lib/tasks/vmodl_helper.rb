@@ -76,7 +76,16 @@ class VmodlHelper
 
         @vmodl[type_name] = vmodl_data
         @vmodl['_typenames']['_typenames'] << type_name
+
+        puts "Adding #{type_name} to vmodl"
+
+        RbVmomi::VIM.loader.add_types type_name => vmodl_data
       end
+    end
+
+    wsdl_types_by_name.each_value do |type|
+      type_name = type.name.name
+      vmodl_data = @vmodl[type_name]
 
       elements_by_name = type.elements.index_by { |e| e.name.name }
 
