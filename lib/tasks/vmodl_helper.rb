@@ -10,32 +10,32 @@ require 'rbvmomi/sms'
 
 class VmodlHelper
   class << self
-    def verify!(argv)
-      opts = Optimist.options(argv) do
-        educate_on_error
-        opt :wsdl, 'Path to the vsphere-ws wsdl file', type: :string, required: true
-        opt :vmodl, 'Path to the vmodl.db', type: :string, default: 'vmodl.db'
-        banner <<~EOS
-          Usage:
-          rake vmodl:verify -- --wsdl=path/to/wsdl
-        EOS
-      end
-
-      new(vmodl_path: opts[:vmodl], wsdl_path: opts[:wsdl]).verify!
+    def verify!
+      run!('verify')
     end
 
-    def generate!(argv)
-      opts = Optimist.options(argv) do
+    def generate!
+      run!('generate')
+    end
+
+    private
+
+    def run!(mode)
+      vmodl, wsdl = options(mode).values_at(:vmodl, :wsdl)
+      new(vmodl_path: vmodl, wsdl_path: wsdl).send("#{mode}!")
+    end
+
+    def options(rake_task)
+      argv = (i = ARGV.index('--')) ? ARGV.slice((i + 1)..-1) : ARGV.dup
+      Optimist.options(argv) do
         educate_on_error
         opt :wsdl, 'Path to the vsphere-ws wsdl file', type: :string, required: true
         opt :vmodl, 'Path to the vmodl.db', type: :string, default: 'vmodl.db'
         banner <<~EOS
           Usage:
-          rake vmodl:generate -- --wsdl=path/to/wsdl
+          rake vmodl:#{rake_task} -- --wsdl=path/to/wsdl
         EOS
       end
-
-      new(vmodl_path: opts[:vmodl], wsdl_path: opts[:wsdl]).generate!
     end
   end
 
