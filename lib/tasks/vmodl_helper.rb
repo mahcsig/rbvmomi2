@@ -26,7 +26,7 @@ class VmodlHelper
     end
 
     def options(rake_task)
-      argv = (i = ARGV.index('--')) ? ARGV.slice((i + 1)..-1) : ARGV.dup
+      argv = ARGV.slice_after('--').to_a.last
       Optimist.options(argv) do
         educate_on_error
         opt :wsdl, 'Path to the vsphere-ws wsdl file', type: :string, required: true
@@ -51,9 +51,7 @@ class VmodlHelper
     # Loop through the ComplexTypes in the WSDL and compare their types
     # to the types which are defined in the vmodl.db
     wsdl_types_by_name.each_value do |type|
-      type_name = type.name.name
-      next if type_name.match?(/^ArrayOf/) || type_name.match(/RequestType$/)
-
+      type_name  = type.name.name
       vmodl_data = @vmodl[type_name]
 
       # If a type exists in the WSDL but not in the vmodl.db this usually
