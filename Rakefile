@@ -7,6 +7,8 @@ require 'rake/testtask'
 require 'yard'
 require 'rubocop/rake_task'
 
+Dir.glob(File.join('lib/tasks/**/*.rake')).each { |file| load file }
+
 task(default: :test)
 
 Rake::TestTask.new do |t|
