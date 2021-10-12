@@ -8,6 +8,7 @@ namespace :vmodl do
     VmodlHelper.verify!
   end
 
+  desc 'Generate vmodl.db'
   task :generate do
     VmodlHelper.generate!
   end
