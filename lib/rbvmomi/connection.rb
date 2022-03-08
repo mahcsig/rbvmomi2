@@ -195,7 +195,7 @@ module RbVmomi
       end
       xml
     rescue
-      RbVmomi.logger.error("#{$!.class} while serializing #{name} (#{type}): #{o.pretty_inspect}")
+      RbVmomi.logger.error("#{$!.class} while serializing #{name} (#{type})\n#{o.pretty_inspect}")
       raise
     end
 

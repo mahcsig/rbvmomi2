@@ -221,8 +221,7 @@ module RbVmomi
       else raise "unexpected type #{t.inspect} (#{t.ancestors * '/'})"
       end
     rescue
-      RbVmomi.logger.error("#{$!.class} while deserializing #{xml.name} (#{typename}):")
-      RbVmomi.logger.error(xml.to_s)
+      RbVmomi.logger.error("#{$!.class} while deserializing #{xml.name} (#{typename}):\n#{xml.to_s}")
       raise
     end
 
