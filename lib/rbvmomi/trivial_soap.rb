@@ -84,11 +84,7 @@ class RbVmomi::TrivialSoap
     headers = { 'content-type' => 'text/xml; charset=utf-8', 'SOAPAction' => action }
     headers['cookie'] = @cookie if @cookie
 
-    if @debug
-      $stderr.puts 'Request:'
-      $stderr.puts body
-      $stderr.puts
-    end
+    RbVmomi.logger.debug("Request:\n#{body}") if @debug
 
     if @cookie.nil? && @sso
       @sso.request_token unless @sso.assertion_id
@@ -112,11 +108,7 @@ class RbVmomi::TrivialSoap
 
     nk = Nokogiri(response.body)
 
-    if @debug
-      $stderr.puts "Response (in #{'%.3f' % (end_time - start_time)} s)"
-      $stderr.puts nk
-      $stderr.puts
-    end
+    RbVmomi.logger.debug("Response (in #{'%.3f' % (end_time - start_time)} s)\n#{nk}") if @debug
 
     [nk.xpath('//soapenv:Body/*').select(&:element?).first, response.body.size]
   end

@@ -18,7 +18,7 @@ module RbVmomi
     # @option opts [String]  :user (root) Username.
     # @option opts [String]  :password Password.
     # @option opts [String]  :path (/sdk) SDK endpoint path.
-    # @option opts [Boolean] :debug (false) If true, print SOAP traffic to stderr.
+    # @option opts [Boolean] :debug (false) If true, print SOAP traffic to RbVmomi.logger.debug.
     # @option opts [String]  :operation_id If set, use for operationID
     # @option opts [Boolean] :close_on_exit (true) If true, will close connection with at_exit
     # @option opts [RbVmomi::SSO] :sso (nil) Use SSO token to login if set
@@ -56,7 +56,7 @@ module RbVmomi
     def close
       serviceContent.sessionManager.Logout
     rescue RbVmomi::Fault => e
-      $stderr.puts(e.message) if debug
+      RbVmomi.logger.error(e.message) if debug
     ensure
       self.cookie = nil
       super

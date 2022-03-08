@@ -12,6 +12,7 @@ module RbVmomi
 end
 
 require_relative 'rbvmomi/connection'
+require_relative 'rbvmomi/logging'
 require_relative 'rbvmomi/sso'
 require_relative 'rbvmomi/version'
 require_relative 'rbvmomi/vim'
