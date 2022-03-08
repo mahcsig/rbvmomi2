@@ -195,8 +195,7 @@ module RbVmomi
       end
       xml
     rescue
-      $stderr.puts "#{$!.class} while serializing #{name} (#{type}):"
-      PP.pp o, $stderr
+      RbVmomi.logger.error("#{$!.class} while serializing #{name} (#{type}): #{o}")
       raise
     end
 

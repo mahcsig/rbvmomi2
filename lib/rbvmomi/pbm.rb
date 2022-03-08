@@ -18,7 +18,7 @@ module RbVmomi
     # @option opts [Boolean] :ssl (true) Whether to use SSL.
     # @option opts [Boolean] :insecure (false) If true, ignore SSL certificate errors.
     # @option opts [String]  :path (/pbm/sdk) SDK endpoint path.
-    # @option opts [Boolean] :debug (false) If true, print SOAP traffic to stderr.
+    # @option opts [Boolean] :debug (false) If true, print SOAP traffic to RbVmomi.logger.debug.
     def self.connect vim, opts = {}
       raise unless opts.is_a? Hash
 
