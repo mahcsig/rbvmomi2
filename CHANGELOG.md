@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Add a configurable RbVmomi.logger (#14)
 
 ## [3.2.0] - 2021-10-08
 ### Added
