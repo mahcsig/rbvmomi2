@@ -6,7 +6,9 @@ module RbVmomi
   end
 
   def self.logger
-    require 'logger'
-    @logger ||= Logger.new($stderr)
+    @logger ||= begin
+      require 'logger'
+      Logger.new($stderr)
+    end
   end
 end
