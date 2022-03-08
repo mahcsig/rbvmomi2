@@ -9,10 +9,4 @@ module RbVmomi
     require 'logger'
     @logger ||= Logger.new($stderr)
   end
-
-  module Logging
-    def logger
-      RbVmomi.logger
-    end
-  end
 end
