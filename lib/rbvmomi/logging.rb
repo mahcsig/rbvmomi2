@@ -7,7 +7,7 @@ module RbVmomi
 
   def self.logger
     require 'logger'
-    @logger ||= Logger.new(nil)
+    @logger ||= Logger.new($stderr)
   end
 
   module Logging
