@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [3.3.0] - 2022-03-10
 ### Added
 - Add a configurable RbVmomi.logger (#14)
 
@@ -24,7 +26,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix unescaped characters in Datastore URLs (#183)
 - Improve #to_json behavior on RbVmomi Objects (#185)
 
-[Unreleased]: https://github.com/ManageIQ/rbvmomi2/compare/v3.2.0...HEAD
+[Unreleased]: https://github.com/ManageIQ/rbvmomi2/compare/v3.3.0...HEAD
+[3.3.0]: https://github.com/ManageIQ/rbvmomi2/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/ManageIQ/rbvmomi2/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/ManageIQ/rbvmomi2/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/ManageIQ/rbvmomi2/compare/v3.0.0-1...v3.0.1
