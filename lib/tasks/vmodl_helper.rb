@@ -86,35 +86,24 @@ class VmodlHelper
 
   def generate!
     wsdl_types_by_name.each_value do |type|
-      type_name  = type.name.name
-      vmodl_data = @vmodl[type_name]
+      type_name = type.name.name
 
-      if vmodl_data.nil?
-        base_class           = wsdl_types_by_name[type.complexcontent.extension.base.name]
-        inherited_properties = base_class.elements.map { |element| element.name.name }
-        properties           = type.elements.reject { |e| inherited_properties.include?(e.name.name) }
+      # Update the existing vmodl object if it exists otherwise instantiate a
+      # new one.
+      vmodl_data = @vmodl[type_name] || build_wsdl_obj!(type)
+      props_by_name = vmodl_data['props'].index_by { |prop| prop['name'] }
 
-        vmodl_data = {
-          'kind'      => 'data',
-          'props'     => properties.map do |element|
-            {
-              'name'           => element.name.name,
-              'is-optional'    => element.minoccurs == 0,
-              'is-array'       => element.maxoccurs != 1,
-              'version-id-ref' => nil,
-              'wsdl_type'      => wsdl_to_vmodl_type(element.type)
-            }
-          end,
-          'wsdl_base' => type.complexcontent.extension.base.name
-        }
-
-        @vmodl[type_name] = vmodl_data
-        @vmodl['_typenames']['_typenames'] << type_name
-
-        puts "Adding #{type_name} to vmodl"
-
-        wsdl_to_rbvmomi_namespace(type).loader.add_types type_name => vmodl_data
+      vmodl_data['props'] = wsdl_properties(type).map do |element|
+        # NOTE we should prioritize the existing property hash over building a
+        # new one because the generic ManagedObjectReferences are manually
+        # replaced with their specific counterparts (e.g. Datastore) which
+        # cannot be computed programmatically.
+        props_by_name[element.name.name] || build_vmodl_property(element)
       end
+
+      # Some types (e.g. ManagedObjectReference) have extra properties which are
+      # not present in the WSDL but are required for proper function of RbVmomi.
+      vmodl_data['props'] += extra_props_for_type(type_name)
     end
 
     wsdl_types_by_name.each_value do |type|
@@ -158,6 +147,48 @@ class VmodlHelper
   end
 
   private
+
+  def build_wsdl_obj!(type)
+    puts "Adding #{type_name} to vmodl"
+
+    vmodl_obj = {'kind' => 'data', 'props' => [], 'wsdl_base' => type.complexcontent.extension.base.name}
+
+    @vmodl[type.name.name] = vmodl_obj
+    @vmodl['_typenames']['_typenames'] << type.name.name
+
+    wsdl_to_rbvmomi_namespace(type).loader.add_types type_name => vmodl_obj
+  end
+
+  def build_vmodl_property(element)
+    {
+      'name'           => element.name.name,
+      'is-optional'    => element.minoccurs == 0,
+      'is-array'       => element.maxoccurs != 1,
+      'version-id-ref' => nil,
+      'wsdl_type'      => wsdl_to_vmodl_type(element.type)
+    }
+  end
+
+  def wsdl_properties(type)
+    base_class = wsdl_types_by_name[type.complexcontent&.extension&.base&.name]
+    if base_class
+      inherited_properties = base_class.elements.map { |element| element.name.name }
+      type.elements.reject { |e| inherited_properties.include?(e.name.name) }
+    else
+      type.elements
+    end
+  end
+
+  def extra_props_for_type(type)
+    @extra_props_for_type ||= {
+      'ManagedObjectReference' => [
+        {'name' => 'type',  'is-optional' => false, 'is-array' => false, 'version-id-ref' => nil, 'wsdl_type' => 'xsd:string'},
+        {'name' => 'value', 'is-optional' => false, 'is-array' => false, 'version-id-ref' => nil, 'wsdl_type' => 'xsd:string'}
+      ]
+    }
+
+    @extra_props_for_type[type] || []
+  end
 
   def wsdl_types_by_name
     @wsdl_types_by_name ||= @wsdl.collect_complextypes
