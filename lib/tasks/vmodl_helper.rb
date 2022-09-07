@@ -236,6 +236,6 @@ class VmodlHelper
     type = 'ManagedObject' if type == 'ManagedObjectReference'
 
     type = type.camelcase
-    type.safe_constantize || "RbVmomi::BasicTypes::#{type}".safe_constantize || "RbVmomi::VIM::#{type}".safe_constantize
+    type.safe_constantize || "RbVmomi::BasicTypes::#{type}".safe_constantize || "#{wsdl_to_rbvmomi_namespace(@wsdl)}::#{type}".safe_constantize
   end
 end
