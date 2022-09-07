@@ -149,14 +149,18 @@ class VmodlHelper
   private
 
   def build_wsdl_obj!(type)
+    type_name = type.name.name
+
     puts "Adding #{type_name} to vmodl"
 
     vmodl_obj = {'kind' => 'data', 'props' => [], 'wsdl_base' => type.complexcontent.extension.base.name}
 
-    @vmodl[type.name.name] = vmodl_obj
-    @vmodl['_typenames']['_typenames'] << type.name.name
+    @vmodl[type_name] = vmodl_obj
+    @vmodl['_typenames']['_typenames'] << type_name
 
-    wsdl_to_rbvmomi_namespace(type).loader.add_types type_name => vmodl_obj
+    wsdl_to_rbvmomi_namespace(type).loader.add_types(type_name => vmodl_obj)
+
+    vmodl_obj
   end
 
   def build_vmodl_property(element)
