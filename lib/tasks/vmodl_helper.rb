@@ -50,7 +50,7 @@ class VmodlHelper
   def verify!
     # Loop through the ComplexTypes in the WSDL and compare their types
     # to the types which are defined in the vmodl.db
-    wsdl_types_by_name.each_value do |type|
+    wsdl_classes_by_name.each_value do |type|
       type_name  = type.name.name
       vmodl_data = @vmodl[type_name]
 
@@ -60,7 +60,7 @@ class VmodlHelper
       #
       # Print a warning that the type is missing and skip it.
       if vmodl_data.nil?
-        puts " #{type_name} is missing"
+        puts " class #{type_name} is missing"
         next
       end
 
@@ -82,15 +82,26 @@ class VmodlHelper
         puts "#{type_name}.#{vmodl_prop["name"]} #{wsdl_klass.wsdl_name} doesn't match #{vmodl_klass.wsdl_name}" unless vmodl_klass <= wsdl_klass
       end
     end
+
+    # Loop through the SimpleTypes (enums) in the WSDL
+    wsdl_enums_by_name.each_value do |enum|
+      enum_name = enum.name.name
+      vmodl_data = @vmodl[enum_name]
+
+      if vmodl_data.nil?
+        puts " enum #{enum_name} is missing"
+        next
+      end
+    end
   end
 
   def generate!
-    wsdl_types_by_name.each_value do |type|
+    wsdl_classes_by_name.each_value do |type|
       type_name = type.name.name
 
       # Update the existing vmodl object if it exists otherwise instantiate a
       # new one.
-      vmodl_data = @vmodl[type_name] || build_wsdl_obj!(type)
+      vmodl_data = @vmodl[type_name] || build_wsdl_class!(type)
       props_by_name = vmodl_data['props'].index_by { |prop| prop['name'] }
 
       vmodl_data['props'] = wsdl_properties(type).map do |element|
@@ -106,7 +117,14 @@ class VmodlHelper
       vmodl_data['props'] += extra_props_for_type(type_name)
     end
 
-    wsdl_types_by_name.each_value do |type|
+    wsdl_enums_by_name.each_value do |enum|
+      enum_name = enum.name.name
+
+      vmodl_data = @vmodl[enum_name] || build_wsdl_enum(enum)
+      vmodl_data['values'] = enum.restriction.enumeration
+    end
+
+    wsdl_classes_by_name.each_value do |type|
       type_name = type.name.name
       vmodl_data = @vmodl[type_name]
 
@@ -148,15 +166,34 @@ class VmodlHelper
 
   private
 
-  def build_wsdl_obj!(type)
-    puts "Adding #{type_name} to vmodl"
+  def build_wsdl_class!(type)
+    type_name = type.name.name
+
+    puts "Adding class #{type_name} to vmodl"
 
     vmodl_obj = {'kind' => 'data', 'props' => [], 'wsdl_base' => type.complexcontent.extension.base.name}
 
-    @vmodl[type.name.name] = vmodl_obj
-    @vmodl['_typenames']['_typenames'] << type.name.name
+    @vmodl[type_name] = vmodl_obj
+    @vmodl['_typenames']['_typenames'] << type_name
 
-    wsdl_to_rbvmomi_namespace(type).loader.add_types type_name => vmodl_obj
+    wsdl_to_rbvmomi_namespace(type).loader.add_types(type_name => vmodl_obj)
+
+    vmodl_obj
+  end
+
+  def build_wsdl_enum(enum)
+    enum_name = enum.name.name
+
+    puts "Adding enum #{enum_name} to vmodl"
+
+    vmodl_obj = {'kind' => 'enum', 'values' => []}
+
+    @vmodl[enum_name] = vmodl_obj
+    @vmodl['_typenames']['_typenames'] << enum_name
+
+    wsdl_to_rbvmomi_namespace(enum).loader.add_types(enum_name => vmodl_obj)
+
+    vmodl_obj
   end
 
   def build_vmodl_property(element)
@@ -170,7 +207,7 @@ class VmodlHelper
   end
 
   def wsdl_properties(type)
-    base_class = wsdl_types_by_name[type.complexcontent&.extension&.base&.name]
+    base_class = wsdl_classes_by_name[type.complexcontent&.extension&.base&.name]
     if base_class
       inherited_properties = base_class.elements.map { |element| element.name.name }
       type.elements.reject { |e| inherited_properties.include?(e.name.name) }
@@ -190,10 +227,14 @@ class VmodlHelper
     @extra_props_for_type[type] || []
   end
 
-  def wsdl_types_by_name
-    @wsdl_types_by_name ||= @wsdl.collect_complextypes
+  def wsdl_classes_by_name
+    @wsdl_classes_by_name ||= @wsdl.collect_complextypes
       .reject   { |type| type.name.name.match?(/^ArrayOf|RequestType$/) }
       .index_by { |type| type.name.name }
+  end
+
+  def wsdl_enums_by_name
+    @wsdl_enums_by_name ||= @wsdl.collect_simpletypes.index_by { |type| type.name.name }
   end
 
   def wsdl_to_vmodl_type(type)
@@ -211,7 +252,7 @@ class VmodlHelper
 
   def wsdl_to_rbvmomi_namespace(type)
     case type.targetnamespace
-    when 'urb:vim25'
+    when 'urn:vim25'
       RbVmomi::VIM
     when 'urn:pbm'
       RbVmomi::PBM
@@ -232,6 +273,6 @@ class VmodlHelper
     type = 'ManagedObject' if type == 'ManagedObjectReference'
 
     type = type.camelcase
-    type.safe_constantize || "RbVmomi::BasicTypes::#{type}".safe_constantize || "RbVmomi::VIM::#{type}".safe_constantize
+    type.safe_constantize || "RbVmomi::BasicTypes::#{type}".safe_constantize || "#{wsdl_to_rbvmomi_namespace(@wsdl)}::#{type}".safe_constantize
   end
 end
