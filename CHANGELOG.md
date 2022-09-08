@@ -4,6 +4,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.4.0] - 2022-09-09
+### Added
+- Add support for vSphere 7.0U3f
+
+### Fixed
+- Fix new properties not being added to existing objects (#16)
+- Fix new enums not being added (#17)
+
 ## [3.3.0] - 2022-03-10
 ### Added
 - Add a configurable RbVmomi.logger (#14)
