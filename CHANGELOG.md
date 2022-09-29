@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.4.1] - 2022-09-29
+### Fixed
+- Fix new properties being cleared by SMS.wsdl (#19)
+
 ## [3.4.0] - 2022-09-09
 ### Added
 - Add support for vSphere 7.0U3f
