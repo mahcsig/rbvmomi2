@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Update the default latest supported vSphere version (#20)
 
 ## [3.4.1] - 2022-09-29
 ### Fixed
