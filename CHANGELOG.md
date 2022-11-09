@@ -4,6 +4,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.5.0] - 2022-11-09
+### Added
+- Add vSphere 8.0 support (#21)
+- Add a manual option to run the Test github action on demand (#22)
+- Test with ruby 3.0 and 3.1 (#25)
+
+### Fixed
+- Bundler v2.3.24 resolves windows nokogiri issue (#26)
+
 ## [3.4.2] - 2022-09-30
 ### Fixed
 - Update the default latest supported vSphere version (#20)
@@ -42,7 +51,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix unescaped characters in Datastore URLs (#183)
 - Improve #to_json behavior on RbVmomi Objects (#185)
 
-[Unreleased]: https://github.com/ManageIQ/rbvmomi2/compare/v3.3.0...HEAD
+[Unreleased]: https://github.com/ManageIQ/rbvmomi2/compare/v3.5.0...HEAD
+[3.5.0]: https://github.com/ManageIQ/rbvmomi2/compare/v3.5.0...v3.4.0
+[3.4.0]: https://github.com/ManageIQ/rbvmomi2/compare/v3.4.0...v3.3.0
 [3.3.0]: https://github.com/ManageIQ/rbvmomi2/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/ManageIQ/rbvmomi2/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/ManageIQ/rbvmomi2/compare/v3.0.1...v3.1.0
