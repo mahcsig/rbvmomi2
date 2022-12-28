@@ -8,7 +8,7 @@ require 'set'
 module RbVmomi
   module BasicTypes
 
-    BUILTIN = Set.new %w(ManagedObject DataObject TypeName PropertyPath ManagedObjectReference MethodName MethodFault LocalizedMethodFault KeyValue)
+    BUILTIN = Set.new %w(ManagedObject DataObject TypeName PropertyPath ManagedObjectReference MethodName MethodFault LocalizedMethodFault KeyValue ContentLibrary)
 
     class Base
       class << self
@@ -340,6 +340,8 @@ module RbVmomi
     class TypeName < String
       def self.wsdl_name; 'TypeName' end
     end
+
+    class ContentLibrary < ManagedObject; end
 
     class ManagedObjectReference
       def self.wsdl_name; 'ManagedObjectReference' end
